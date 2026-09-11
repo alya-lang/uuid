@@ -1,0 +1,13 @@
+[package]
+name = "uuid"
+version = "0.1.0"
+alya-version = "0.0.7"
+entry = "src/lib.alya"
+description = "RFC 4122 UUID v4, RFC 9562 UUID v7, ULID, and NanoID toolkit for Alya"
+authors = ["Alya Language Contributors <https://github.com/alya-lang>"]
+license = "MIT"
+homepage = "https://github.com/alya-lang/alya"
+repository = "https://github.com/alya-lang/uuid"
+keywords = ["alya", "alya-lang", "package", "uuid", "uuidv4", "uuidv7", "ulid", "nanoid", "identifier"]
+
+[dependencies]
