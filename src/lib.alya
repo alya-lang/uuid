@@ -1,14 +1,144 @@
-# uuid library
+# lib.alya - Public API Facade for uuid package
 # Part of the Alya Language package ecosystem (https://github.com/alya-lang)
 
 import "./types.alya"
-import "./core/formatter.alya"
+import "./core/v4.alya"
+import "./core/v7.alya"
+import "./core/ulid.alya"
+import "./core/nanoid.alya"
+import "./core/parse.alya"
 
-# Public facade functions
-function hello(name = "World")
-    return core_format_greeting(name)
+# Constants
+function nil_uuid()
+    return "00000000-0000-0000-0000-000000000000"
 end
 
-function new_config(name = "World", count = 1)
-    return make_config(name, count)
+function max_uuid()
+    return "ffffffff-ffff-ffff-ffff-ffffffffffff"
+end
+
+# ═══════════════════════════════════════════════════════════════
+# 1. UUID Generation (RFC 4122 v4 & RFC 9562 v7)
+# ═══════════════════════════════════════════════════════════════
+
+# Generates standard 36-character RFC 4122 UUID v4
+function v4()
+    return core_v4()
+end
+
+# Generates 32-character hex UUID v4 without hyphens
+function v4_simple()
+    return core_v4_simple()
+end
+
+# Generates standard 36-character RFC 9562 UUID v7 using current system time
+function v7()
+    return core_v7()
+end
+
+# Generates standard 36-character RFC 9562 UUID v7 for given timestamp (in ms)
+function v7_at(timestamp_ms)
+    return core_v7_at(timestamp_ms)
+end
+
+# Generates 32-character hex UUID v7 without hyphens using current system time
+function v7_simple()
+    return core_v7_simple()
+end
+
+# Generates 32-character hex UUID v7 without hyphens for given timestamp (in ms)
+function v7_simple_at(timestamp_ms)
+    return core_v7_simple_at(timestamp_ms)
+end
+
+# ═══════════════════════════════════════════════════════════════
+# 2. ULID & NanoID Generation
+# ═══════════════════════════════════════════════════════════════
+
+# Generates 26-character Crockford Base32 ULID
+function ulid()
+    return core_ulid()
+end
+
+# Generates 26-character Crockford Base32 ULID for given timestamp (in ms)
+function ulid_at(timestamp_ms)
+    return core_ulid_at(timestamp_ms)
+end
+
+# Decodes 48-bit millisecond timestamp from ULID string
+function ulid_timestamp(ulid_str)
+    return core_ulid_timestamp(ulid_str)
+end
+
+# Validates if string is a valid 26-character ULID
+function ulid_is_valid(ulid_str)
+    return core_ulid_is_valid(ulid_str)
+end
+
+# Generates URL-friendly NanoID of given size
+function nanoid(size = 21, alphabet = "_-0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
+    return core_nanoid(size, alphabet)
+end
+
+# ═══════════════════════════════════════════════════════════════
+# 3. Validation, Inspection & Parsing
+# ═══════════════════════════════════════════════════════════════
+
+# Returns 1 if string is a valid 36-char standard or 32-char simple UUID, else 0
+function is_valid(s)
+    return core_is_valid(s)
+end
+
+# Returns 1 if UUID is the Nil UUID, else 0
+function is_nil(s)
+    return core_is_nil(s)
+end
+
+# Returns 1 if UUID is the Max UUID, else 0
+function is_max(s)
+    return core_is_max(s)
+end
+
+# Extracts UUID version (e.g. 4 or 7) as an integer. Returns 0 if invalid.
+function version(s)
+    return core_version(s)
+end
+
+# Extracts Unix timestamp in milliseconds from a UUID v7 string. Returns 0 if not v7.
+function get_timestamp(s)
+    return core_timestamp(s)
+end
+
+function extract_timestamp(s)
+    return core_timestamp(s)
+end
+
+# Converts UUID string into an array of 16 byte integers (0..255)
+function to_bytes(s)
+    return core_to_bytes(s)
+end
+
+# Constructs standard 36-character UUID string from 16 byte integers
+function from_bytes(bytes)
+    return core_from_bytes(bytes)
+end
+
+# Converts 36-character UUID to 32-character simple hex string
+function to_simple(s)
+    return core_to_simple(s)
+end
+
+# Converts 32-character simple hex string to 36-character standard UUID
+function to_standard(simple_hex)
+    return core_to_standard(simple_hex)
+end
+
+# Formats UUID as RFC 4122 URN (urn:uuid:...)
+function to_urn(s)
+    return core_to_urn(s)
+end
+
+# Parses a UUID string into a Uuid struct
+function parse(s)
+    return core_parse_uuid(s)
 end

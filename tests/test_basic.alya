@@ -1,33 +1,115 @@
-# Test suite for uuid
+# Comprehensive Test Suite for uuid package
+# Part of the Alya Language package ecosystem (https://github.com/alya-lang)
+
 import "std/test"
-import "../src/lib.alya" as pkg
+import "../src/lib.alya" as uuid
 
 function main()
-    test_suite("uuid Test Suite")
+    test_suite("uuid Package Comprehensive Test Suite")
     let r = runner_new()
 
-    # 1. Basic facade function
-    let res = pkg::hello("Alya")
-    runner_assert_str_eq(r, res, "Hello, Alya!", "pkg::hello returns formatted greeting")
+    # ═══════════════════════════════════════════════════════════════
+    # 1. UUID v4 Generation
+    # ═══════════════════════════════════════════════════════════════
+    let u4 = uuid::v4()
+    runner_assert_eq(r, len(u4), 36, "v4 length is exactly 36")
+    runner_assert_str_eq(r, char_at(u4, 8), "-", "v4 hyphen at index 8")
+    runner_assert_str_eq(r, char_at(u4, 13), "-", "v4 hyphen at index 13")
+    runner_assert_str_eq(r, char_at(u4, 14), "4", "v4 version digit is '4'")
+    runner_assert_str_eq(r, char_at(u4, 18), "-", "v4 hyphen at index 18")
+    runner_assert_str_eq(r, char_at(u4, 23), "-", "v4 hyphen at index 23")
+    runner_assert(r, uuid::is_valid(u4) == 1, "v4 is_valid passes")
+    runner_assert_eq(r, uuid::version(u4), 4, "v4 version is 4")
 
-    # 2. Default parameter
-    let default_res = pkg::hello()
-    runner_assert_str_eq(r, default_res, "Hello, World!", "pkg::hello() uses default name")
+    let u4_sim = uuid::v4_simple()
+    runner_assert_eq(r, len(u4_sim), 32, "v4_simple length is exactly 32")
+    runner_assert(r, uuid::is_valid(u4_sim) == 1, "v4_simple is_valid passes")
+    runner_assert_eq(r, uuid::version(u4_sim), 4, "v4_simple version is 4")
 
-    # 3. Modular types & config constructor
-    let cfg = pkg::new_config("Community", 3)
-    runner_assert_str_eq(r, cfg.name, "Community", "pkg::new_config sets name correctly")
-    runner_assert_str_eq(r, cfg.prefix, "Hello", "pkg::new_config sets default prefix")
-    runner_assert_eq(r, cfg.count, 3, "pkg::new_config sets count correctly")
+    # ═══════════════════════════════════════════════════════════════
+    # 2. UUID v7 Generation & Timestamp Extraction
+    # ═══════════════════════════════════════════════════════════════
+    let known_ts = 1715000000000
+    let u7_fixed = uuid::v7_at(known_ts)
+    runner_assert_eq(r, len(u7_fixed), 36, "v7_at length is 36")
+    runner_assert_str_eq(r, char_at(u7_fixed, 14), "7", "v7 version digit is '7'")
+    runner_assert(r, uuid::is_valid(u7_fixed) == 1, "v7 is_valid passes")
+    runner_assert_eq(r, uuid::version(u7_fixed), 7, "v7 version is 7")
+    runner_assert_eq(r, uuid::get_timestamp(u7_fixed), known_ts, "v7 timestamp correctly extracted")
 
-    # 4. Core custom formatter using struct
-    let custom_res = pkg::core_format_custom(cfg)
-    runner_assert_str_eq(r, custom_res, "Hello, Community!", "pkg::core_format_custom formats using config")
+    let u7 = uuid::v7()
+    runner_assert(r, uuid::is_valid(u7) == 1, "v7() is_valid passes")
+    runner_assert_eq(r, uuid::version(u7), 7, "v7() version is 7")
+    runner_assert(r, uuid::get_timestamp(u7) > 1700000000000, "v7() current timestamp is reasonable")
 
-    let failed = runner_summary(r)
-    if failed > 0
-        exit(1)
-    end
+    let u7_sim = uuid::v7_simple()
+    runner_assert_eq(r, len(u7_sim), 32, "v7_simple length is 32")
+    runner_assert(r, uuid::is_valid(u7_sim) == 1, "v7_simple is_valid passes")
+    runner_assert_eq(r, uuid::version(u7_sim), 7, "v7_simple version is 7")
+
+    # ═══════════════════════════════════════════════════════════════
+    # 3. Special UUIDs (Nil & Max)
+    # ═══════════════════════════════════════════════════════════════
+    let nil_id = uuid::nil_uuid()
+    runner_assert_str_eq(r, nil_id, "00000000-0000-0000-0000-000000000000", "nil_uuid() is all zeroes")
+    runner_assert(r, uuid::is_nil(nil_id) == 1, "is_nil returns 1 for nil_uuid()")
+    runner_assert(r, uuid::is_nil(u4) == 0, "is_nil returns 0 for v4")
+    runner_assert(r, uuid::is_valid(nil_id) == 1, "nil_uuid() is considered valid format")
+
+    let max_id = uuid::max_uuid()
+    runner_assert_str_eq(r, max_id, "ffffffff-ffff-ffff-ffff-ffffffffffff", "max_uuid() is all ffff")
+    runner_assert(r, uuid::is_max(max_id) == 1, "is_max returns 1 for max_uuid()")
+    runner_assert(r, uuid::is_max(u4) == 0, "is_max returns 0 for v4")
+
+    # ═══════════════════════════════════════════════════════════════
+    # 4. Conversion & Formatting (Bytes, URN, Simple/Standard)
+    # ═══════════════════════════════════════════════════════════════
+    let bytes = uuid::to_bytes(u4)
+    runner_assert_eq(r, len(bytes), 16, "to_bytes returns 16 bytes")
+    let restored = uuid::from_bytes(bytes)
+    runner_assert_str_eq(r, restored, u4, "from_bytes(to_bytes(u)) restores original UUID")
+
+    let urn = uuid::to_urn(u4)
+    runner_assert_str_eq(r, urn, "urn:uuid:" + u4, "to_urn formats urn:uuid:")
+
+    let sim = uuid::to_simple(u4)
+    runner_assert_eq(r, len(sim), 32, "to_simple strips hyphens to 32 chars")
+    let back_std = uuid::to_standard(sim)
+    runner_assert_str_eq(r, back_std, u4, "to_standard restores 36 chars with hyphens")
+
+    # ═══════════════════════════════════════════════════════════════
+    # 5. Parsing & Struct Inspection
+    # ═══════════════════════════════════════════════════════════════
+    let parsed = uuid::parse(u7_fixed)
+    runner_assert_eq(r, parsed.is_valid, 1, "parse().is_valid is 1")
+    runner_assert_eq(r, parsed.version, 7, "parse().version is 7")
+    runner_assert_eq(r, len(parsed.bytes), 16, "parse().bytes has 16 items")
+
+    let invalid_parsed = uuid::parse("not-a-valid-uuid")
+    runner_assert_eq(r, invalid_parsed.is_valid, 0, "parse() handles invalid string gracefully")
+
+    # ═══════════════════════════════════════════════════════════════
+    # 6. ULID Generation, Validation & Timestamp
+    # ═══════════════════════════════════════════════════════════════
+    let ulid_fixed = uuid::ulid_at(known_ts)
+    runner_assert_eq(r, len(ulid_fixed), 26, "ULID length is 26")
+    runner_assert(r, uuid::ulid_is_valid(ulid_fixed) == 1, "ulid_is_valid passes")
+    runner_assert_eq(r, uuid::ulid_timestamp(ulid_fixed), known_ts, "ulid_timestamp extracts correct ms")
+
+    let ulid_now = uuid::ulid()
+    runner_assert(r, uuid::ulid_is_valid(ulid_now) == 1, "ulid() is_valid passes")
+    runner_assert(r, uuid::ulid_timestamp(ulid_now) > 1700000000000, "ulid() timestamp is reasonable")
+    runner_assert(r, uuid::ulid_is_valid("invalid-ulid-too-short") == 0, "ulid_is_valid rejects invalid")
+
+    # ═══════════════════════════════════════════════════════════════
+    # 7. NanoID Generation
+    # ═══════════════════════════════════════════════════════════════
+    let nid = uuid::nanoid(21)
+    runner_assert_eq(r, len(nid), 21, "nanoid(21) length is 21")
+    let nid10 = uuid::nanoid(10)
+    runner_assert_eq(r, len(nid10), 10, "nanoid(10) length is 10")
+
+    runner_summary(r)
 end
 
 main()

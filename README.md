@@ -5,16 +5,18 @@
 [![Alya](https://img.shields.io/badge/dynamic/toml?url=https%3A%2F%2Fraw.githubusercontent.com%2Falya-lang%2Fuuid%2Fmain%2Falya.toml&query=%24.package.alya-version&label=Alya&color=orange&prefix=%3E%3D)](https://github.com/alya-lang/alya)
 [![Package Version](https://img.shields.io/badge/dynamic/toml?url=https%3A%2F%2Fraw.githubusercontent.com%2Falya-lang%2Fuuid%2Fmain%2Falya.toml&query=%24.package.version&label=Version&color=brightgreen)](alya.toml)
 
-RFC 4122 UUID v4, RFC 9562 UUID v7, ULID, and NanoID toolkit for Alya
+RFC 4122 UUID v4, RFC 9562 UUID v7, ULID, and NanoID parsing, generation, and validation for Alya.
 
 ---
 
 ## 🌟 Features
 
-- ⚡ **Lightweight & Fast**: Built for speed with minimal overhead
-- 🧩 **Modular Architecture**: Multi-module design supporting flat modules (`types.alya`) and subfolder hierarchies (`core/formatter.alya`)
-- 🛡️ **Reliable & Typed**: Explicit struct definitions and clean namespaced APIs
-- 🧪 **Well Tested**: Comprehensive test suite with standard assertions
+- 🆔 **UUID Version 4**: RFC 4122 compliant pseudo-random 128-bit identifier generation (hyphenated standard and 32-char simple hex).
+- ⏱️ **UUID Version 7**: RFC 9562 timestamp-ordered identifier generation with millisecond resolution for high-performance database indexing.
+- 🗂️ **ULID**: 26-character Crockford Base32 Universally Unique Lexicographically Sortable Identifier with millisecond timestamp decoding.
+- 🔤 **NanoID**: Compact, URL-friendly unique string identifier with custom alphabet support.
+- 🔍 **Parsing & Inspection**: Format validation (`is_valid`), version detection (`version`), millisecond timestamp extraction (`timestamp`), and structured inspection (`parse`).
+- 🔄 **Conversions & Formats**: 16-byte array serialization (`to_bytes`, `from_bytes`), URN formatting (`to_urn`), Nil (`nil`), and Max (`max`) constants.
 
 ---
 
@@ -22,28 +24,30 @@ RFC 4122 UUID v4, RFC 9562 UUID v7, ULID, and NanoID toolkit for Alya
 
 ```
 uuid/
-├── alya.toml               # Package manifest
+├── alya.toml              # Package manifest
+├── alya.lock              # Locked dependency tree
 ├── src/
-│   ├── lib.alya            # Public API facade
-│   ├── types.alya          # Data structures & struct definitions
-│   └── core/               # Subdirectory module hierarchy (optional for larger packages)
-│       └── formatter.alya  # Domain formatting logic & internal helpers
+│   ├── lib.alya           # Public API facade
+│   ├── types.alya         # Uuid & UlidInfo structs, Nil & Max constants
+│   └── core/
+│       ├── v4.alya        # RFC 4122 UUID v4 generator
+│       ├── v7.alya        # RFC 9562 UUID v7 generator (Time-ordered)
+│       ├── ulid.alya      # Crockford Base32 ULID generator & decoder
+│       ├── nanoid.alya    # Compact URL-safe NanoID generator
+│       └── parse.alya     # Validation, parsing, byte conversion, URN format
 ├── examples/
-│   └── demo.alya           # Runnable usage examples
+│   └── demo.alya          # Runnable showcase
 ├── tests/
-│   └── test_basic.alya     # Automated test suite
+│   └── test_basic.alya    # Comprehensive test suite
 └── benches/
-    └── bench_basic.alya    # Micro-benchmarks
+    └── bench_basic.alya   # Micro-benchmarks
 ```
-
-> [!NOTE]
-> Modules can be structured flat inside `src/` (e.g. `src/types.alya`) or grouped into subdirectories (e.g. `src/core/formatter.alya`). Relative imports like `import "../types.alya"` or `import "./core/formatter.alya"` are resolved relative to the importing file and deduplicated transitively.
 
 ---
 
 ## 📦 Installation
 
-Add `uuid` to the `[dependencies]` section in your `alya.toml`:
+Add `uuid` to your `alya.toml` dependencies:
 
 ```toml
 [dependencies]
@@ -62,17 +66,30 @@ alyac install
 ## 🚀 Quick Start
 
 ```alya
-import "uuid" as pkg
+import "uuid"
 
 function main()
-    # Basic facade call
-    let greeting = pkg::hello("Alya")
-    say greeting
+    # 1. UUID v4 (Random)
+    let u4 = uuid::v4()
+    say "UUID v4: " + u4
 
-    # Struct construction and domain helpers
-    let cfg = pkg::new_config("Community", 2)
-    say "Target: " + cfg.name
-    say "Formatted: " + pkg::core_format_custom(cfg)
+    # 2. UUID v7 (Time-Ordered)
+    let u7 = uuid::v7()
+    say "UUID v7: " + u7
+    say "Extracted timestamp: " + str(uuid::timestamp(u7))
+
+    # 3. Validation & Version
+    if uuid::is_valid(u7)
+        say "Version: " + str(uuid::version(u7))
+    end
+
+    # 4. Byte Conversion
+    let bytes = uuid::to_bytes(u4)
+    let restored = uuid::from_bytes(bytes)
+
+    # 5. ULID & NanoID
+    let my_ulid = uuid::ulid()
+    let my_nanoid = uuid::nanoid(21)
 end
 
 main()
@@ -82,12 +99,44 @@ main()
 
 ## 📖 API Reference
 
+### Generation
+
 | Function | Arguments | Returns | Description |
 |---|---|---|---|
-| `hello(name)` | `name = "World"` | `string` | Returns a friendly greeting message. |
-| `new_config(name, count)` | `name = "World", count = 1` | `UuidConfig` | Constructs a new configuration struct. |
-| `core_format_greeting(name)` | `name` | `string` | Core formatter producing `Hello, {name}!`. |
-| `core_format_custom(config)` | `config: UuidConfig` | `string` | Formats greeting using prefix and name from config. |
+| `v4()` | - | `string` | Generates standard 36-character RFC 4122 UUID v4. |
+| `v4_simple()` | - | `string` | Generates 32-character hex UUID v4 without hyphens. |
+| `v7()` | - | `string` | Generates standard 36-character RFC 9562 UUID v7 using current time. |
+| `v7_at(timestamp_ms)` | `timestamp_ms: int` | `string` | Generates standard 36-character UUID v7 for given millisecond epoch time. |
+| `v7_simple()` | - | `string` | Generates 32-character hex UUID v7 without hyphens using current time. |
+| `v7_simple_at(timestamp_ms)` | `timestamp_ms: int` | `string` | Generates 32-character hex UUID v7 without hyphens for given timestamp. |
+| `ulid()` | - | `string` | Generates 26-character Crockford Base32 ULID. |
+| `ulid_at(timestamp_ms)` | `timestamp_ms: int` | `string` | Generates 26-character Crockford Base32 ULID for given timestamp. |
+| `nanoid(size = 21, alphabet = ...)` | `size: int, alphabet: string` | `string` | Generates URL-friendly unique identifier string. |
+
+### Validation & Parsing
+
+| Function | Arguments | Returns | Description |
+|---|---|---|---|
+| `is_valid(s)` | `s: string` | `int` | Returns `1` if `s` is a valid 36-char or 32-char UUID, else `0`. |
+| `is_nil(s)` | `s: string` | `int` | Returns `1` if `s` is the Nil UUID, else `0`. |
+| `is_max(s)` | `s: string` | `int` | Returns `1` if `s` is the Max UUID, else `0`. |
+| `version(s)` | `s: string` | `int` | Extracts UUID version (`4`, `7`, etc.). Returns `0` if invalid. |
+| `timestamp(s)` | `s: string` | `int` | Extracts 48-bit millisecond Unix timestamp from UUID v7. Returns `0` if not v7. |
+| `ulid_timestamp(s)` | `s: string` | `int` | Decodes 48-bit millisecond timestamp from ULID string. |
+| `ulid_is_valid(s)` | `s: string` | `int` | Returns `1` if `s` is a valid 26-char Crockford Base32 ULID. |
+| `parse(s)` | `s: string` | `Uuid` | Parses string into structured `Uuid` struct (`raw`, `version`, `is_valid`, `bytes`). |
+
+### Conversions & Formatting
+
+| Function | Arguments | Returns | Description |
+|---|---|---|---|
+| `to_bytes(s)` | `s: string` | `array` | Converts UUID string to array of 16 byte integers (0..255). |
+| `from_bytes(bytes)` | `bytes: array` | `string` | Constructs standard 36-character UUID from 16 byte integers. |
+| `to_simple(s)` | `s: string` | `string` | Strips hyphens to return 32-character hexadecimal string. |
+| `to_standard(s)` | `s: string` | `string` | Formats 32-character hex string into 36-character standard `8-4-4-4-12`. |
+| `to_urn(s)` | `s: string` | `string` | Formats UUID as RFC 4122 URN (`urn:uuid:...`). |
+| `nil_uuid()` | - | `string` | Returns the Nil UUID (`00000000-0000-0000-0000-000000000000`). |
+| `max_uuid()` | - | `string` | Returns the Max UUID (`ffffffff-ffff-ffff-ffff-ffffffffffff`). |
 
 ---
 
@@ -110,25 +159,6 @@ Run the example demo:
 ```bash
 alyac run examples/demo.alya
 ```
-
----
-
-## 🤝 Contributing
-
-Contributions are welcome! Please follow these steps:
-
-1. Fork the repository and clone it locally
-2. Install dependencies:
-   ```bash
-   alyac install
-   ```
-3. Create your feature branch (`git checkout -b feature/my-feature`)
-4. Verify tests and formatting before opening a PR:
-   ```bash
-   alyac test
-   alyac fmt . --check
-   ```
-5. Commit your changes (`git commit -m "feat: add feature"`) and open a Pull Request
 
 ---
 

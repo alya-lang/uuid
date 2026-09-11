@@ -1,16 +1,17 @@
 # Types and data structures for uuid
 # Part of the Alya Language package ecosystem (https://github.com/alya-lang)
 
-struct UuidConfig
-    name
-    prefix
-    count
+# Parsed UUID struct representation
+struct Uuid
+    raw
+    version
+    is_valid
+    bytes
 end
 
-function make_config(name = "World", count = 1)
-    return UuidConfig {
-        name: name,
-        prefix: "Hello",
-        count: count
-    }
+# Parsed ULID struct representation
+struct UlidInfo
+    raw
+    timestamp_ms
+    is_valid
 end

@@ -1,0 +1,234 @@
+# parse.alya - Validation, parsing, and inspection utilities for UUIDs
+# Part of the Alya Language package ecosystem (https://github.com/alya-lang)
+
+import "../types.alya"
+
+function _is_hex_char(ch)
+    let c = ord(ch)
+    if (c >= 48 and c <= 57) or (c >= 97 and c <= 102) or (c >= 65 and c <= 70)
+        return 1
+    end
+    return 0
+end
+
+function _hex_to_int(ch)
+    let c = ord(ch)
+    if c >= 48 and c <= 57
+        return c - 48
+    end
+    if c >= 97 and c <= 102
+        return c - 87
+    end
+    if c >= 65 and c <= 70
+        return c - 55
+    end
+    return 0
+end
+
+# Validates if string is a valid UUID (standard 36-char or simple 32-char)
+function core_is_valid(s)
+    let slen = len(s)
+    if slen == 36
+        if char_at(s, 8) != "-" or char_at(s, 13) != "-" or char_at(s, 18) != "-" or char_at(s, 23) != "-"
+            return 0
+        end
+        let i = 0
+        while i < 36
+            if i != 8 and i != 13 and i != 18 and i != 23
+                if _is_hex_char(char_at(s, i)) == 0
+                    return 0
+                end
+            end
+            i += 1
+        end
+        return 1
+    end
+    if slen == 32
+        let i = 0
+        while i < 32
+            if _is_hex_char(char_at(s, i)) == 0
+                return 0
+            end
+            i += 1
+        end
+        return 1
+    end
+    return 0
+end
+
+# Checks if UUID is the Nil UUID (all zeroes)
+function core_is_nil(s)
+    if s == "00000000-0000-0000-0000-000000000000" or s == "00000000000000000000000000000000"
+        return 1
+    end
+    return 0
+end
+
+# Checks if UUID is the Max UUID (all ones / ffff...)
+function core_is_max(s)
+    if s == "ffffffff-ffff-ffff-ffff-ffffffffffff" or s == "FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF" or s == "ffffffffffffffffffffffffffffffff" or s == "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
+        return 1
+    end
+    return 0
+end
+
+# Extracts UUID version (e.g. 4 or 7) as an integer. Returns 0 if invalid.
+function core_version(s)
+    if core_is_valid(s) == 0
+        return 0
+    end
+    let slen = len(s)
+    let v_char = ""
+    if slen == 36
+        v_char = char_at(s, 14)
+    else
+        v_char = char_at(s, 12)
+    end
+    return _hex_to_int(v_char)
+end
+
+# Extracts Unix timestamp in milliseconds from a UUID v7 string. Returns 0 if not v7.
+function core_timestamp(s)
+    if core_is_valid(s) == 0
+        return 0
+    end
+    let v = core_version(s)
+    if v != 7
+        return 0
+    end
+    let hex_time = ""
+    let slen = len(s)
+    if slen == 36
+        let i = 0
+        while i < 8
+            hex_time = hex_time + char_at(s, i)
+            i += 1
+        end
+        i = 9
+        while i < 13
+            hex_time = hex_time + char_at(s, i)
+            i += 1
+        end
+    else
+        let i = 0
+        while i < 12
+            hex_time = hex_time + char_at(s, i)
+            i += 1
+        end
+    end
+
+    let ts = 0
+    let k = 0
+    while k < 12
+        let digit = _hex_to_int(char_at(hex_time, k))
+        ts = bit_or(bit_shl(ts, 4), digit)
+        k += 1
+    end
+    return ts
+end
+
+# Converts UUID string into an array of 16 byte integers (0..255)
+function core_to_bytes(s)
+    if core_is_valid(s) == 0
+        return []
+    end
+    let hex_only = ""
+    let slen = len(s)
+    let i = 0
+    while i < slen
+        let ch = char_at(s, i)
+        if ch != "-"
+            hex_only = hex_only + ch
+        end
+        i += 1
+    end
+
+    let bytes = []
+    let b = 0
+    while b < 16
+        let hi = _hex_to_int(char_at(hex_only, b * 2))
+        let lo = _hex_to_int(char_at(hex_only, (b * 2) + 1))
+        bytes.push(bit_or(bit_shl(hi, 4), lo))
+        b += 1
+    end
+    return bytes
+end
+
+# Formats 32-char hex string into 36-char standard UUID string
+function core_to_standard(simple_hex)
+    if len(simple_hex) != 32
+        return simple_hex
+    end
+    let res = ""
+    let i = 0
+    while i < 32
+        if i == 8 or i == 12 or i == 16 or i == 20
+            res = res + "-"
+        end
+        res = res + char_at(simple_hex, i)
+        i += 1
+    end
+    return res
+end
+
+# Constructs standard 36-char UUID string from 16 byte integers
+function core_from_bytes(bytes)
+    if len(bytes) < 16
+        return "00000000-0000-0000-0000-000000000000"
+    end
+    let hex_chars = "0123456789abcdef"
+    let hex_str = ""
+    let i = 0
+    while i < 16
+        let b = bytes[i]
+        let hi = bit_and(bit_shr(b, 4), 15)
+        let lo = bit_and(b, 15)
+        hex_str = hex_str + char_at(hex_chars, hi) + char_at(hex_chars, lo)
+        i += 1
+    end
+
+    return core_to_standard(hex_str)
+end
+
+# Converts 36-char standard UUID to 32-char simple hex string (without hyphens)
+function core_to_simple(s)
+    let res = ""
+    let slen = len(s)
+    let i = 0
+    while i < slen
+        let ch = char_at(s, i)
+        if ch != "-"
+            res = res + ch
+        end
+        i += 1
+    end
+    return res
+end
+
+# Formats UUID as RFC 4122 URN (urn:uuid:...)
+function core_to_urn(s)
+    let std = s
+    if len(s) == 32
+        std = core_to_standard(s)
+    end
+    return "urn:uuid:" + std
+end
+
+# Parses a UUID string into a Uuid struct
+function core_parse_uuid(s)
+    let valid = core_is_valid(s)
+    if valid == 0
+        return Uuid {
+            raw: s,
+            version: 0,
+            is_valid: 0,
+            bytes: []
+        }
+    end
+    return Uuid {
+        raw: s,
+        version: core_version(s),
+        is_valid: 1,
+        bytes: core_to_bytes(s)
+    }
+end

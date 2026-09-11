@@ -1,0 +1,105 @@
+# ulid.alya - Crockford's Base32 Universally Unique Lexicographically Sortable Identifier
+# Part of the Alya Language package ecosystem (https://github.com/alya-lang)
+
+import "rand" as rand
+
+function _crockford_val(ch)
+    let c = ord(ch)
+    if c >= 48 and c <= 57
+        return c - 48
+    end
+    if c >= 65 and c <= 72
+        return c - 55
+    end
+    if c >= 74 and c <= 75
+        return c - 56
+    end
+    if c >= 77 and c <= 78
+        return c - 57
+    end
+    if c >= 80 and c <= 84
+        return c - 58
+    end
+    if c >= 86 and c <= 90
+        return c - 59
+    end
+    if c >= 97 and c <= 104
+        return c - 87
+    end
+    if c >= 106 and c <= 107
+        return c - 88
+    end
+    if c >= 109 and c <= 110
+        return c - 89
+    end
+    if c >= 112 and c <= 116
+        return c - 90
+    end
+    if c >= 118 and c <= 122
+        return c - 91
+    end
+    return -1
+end
+
+# Generates 26-char ULID for given millisecond timestamp
+function core_ulid_at(timestamp_ms)
+    let crockford = "0123456789ABCDEFGHJKMNPQRSTVWXYZ"
+    let time_rev = []
+    let temp = timestamp_ms
+    let i = 0
+    while i < 10
+        let idx = bit_and(temp, 31)
+        time_rev.push(char_at(crockford, idx))
+        temp = bit_shr(temp, 5)
+        i += 1
+    end
+    let res = ""
+    let j = 9
+    while j >= 0
+        res = res + time_rev[j]
+        j -= 1
+    end
+    let rand_chars = rand::string(16, crockford)
+    return res + rand_chars
+end
+
+# Generates 26-char ULID using current system time
+function core_ulid()
+    let now_ms = (time() * 1000) + (clock_ms() % 1000)
+    return core_ulid_at(now_ms)
+end
+
+# Decodes 48-bit millisecond timestamp from ULID string
+function core_ulid_timestamp(ulid_str)
+    if len(ulid_str) < 10
+        return 0
+    end
+    let ts = 0
+    let i = 0
+    while i < 10
+        let ch = char_at(ulid_str, i)
+        let v = _crockford_val(ch)
+        if v < 0
+            return 0
+        end
+        ts = bit_or(bit_shl(ts, 5), v)
+        i += 1
+    end
+    return ts
+end
+
+# Validates whether string is a valid 26-char Crockford Base32 ULID
+function core_ulid_is_valid(s)
+    if len(s) != 26
+        return 0
+    end
+    let i = 0
+    while i < 26
+        let ch = char_at(s, i)
+        if _crockford_val(ch) < 0
+            return 0
+        end
+        i += 1
+    end
+    return 1
+end

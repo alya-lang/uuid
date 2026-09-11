@@ -1,15 +1,57 @@
-# Example usage of uuid
-import "../src/lib.alya" as pkg
+# demo.alya - Showcase for uuid package
+import "../src/lib.alya" as uuid
 
 function main()
-    # Basic greeting
-    let msg = pkg::hello("Alya Developer")
-    say msg
+    say "=== Alya 'uuid' Identifier Toolkit Showcase ==="
+    say ""
 
-    # Using configuration struct
-    let cfg = pkg::new_config("Modular Architecture", 5)
-    say "Target: " + cfg.name
-    say "Formatted: " + pkg::core_format_custom(cfg)
+    # 1. UUID v4 Generation (Random)
+    say "--- 1. UUID v4 (RFC 4122 Random) ---"
+    let u4 = uuid::v4()
+    say "Standard v4 : " + u4
+    say "Simple v4   : " + uuid::v4_simple()
+    say "Version     : " + str(uuid::version(u4))
+    say "Is Valid    : " + str(uuid::is_valid(u4))
+    say "URN         : " + uuid::to_urn(u4)
+    say ""
+
+    # 2. UUID v7 Generation (Time-ordered)
+    say "--- 2. UUID v7 (RFC 9562 Time-Ordered) ---"
+    let u7 = uuid::v7()
+    say "Standard v7 : " + u7
+    say "Simple v7   : " + uuid::v7_simple()
+    say "Version     : " + str(uuid::version(u7))
+    say "Timestamp ms: " + str(uuid::get_timestamp(u7))
+    say ""
+
+    # 3. Special UUIDs & Validation
+    say "--- 3. Special Values & Checks ---"
+    say "Nil UUID    : " + uuid::nil_uuid()
+    say "Max UUID    : " + uuid::max_uuid()
+    say "Is Nil(nil) : " + str(uuid::is_nil(uuid::nil_uuid()))
+    say "Is Max(max) : " + str(uuid::is_max(uuid::max_uuid()))
+    say ""
+
+    # 4. Binary Serialization
+    say "--- 4. Byte Serialization & Parsing ---"
+    let bytes = uuid::to_bytes(u4)
+    say "Bytes count : " + str(len(bytes))
+    say "First byte  : " + str(bytes[0])
+    say "Restored    : " + uuid::from_bytes(bytes)
+    let p = uuid::parse(u7)
+    say "Parsed v7   : valid=" + str(p.is_valid) + ", ver=" + str(p.version)
+    say ""
+
+    # 5. ULID & NanoID
+    say "--- 5. ULID & NanoID ---"
+    let ulid_id = uuid::ulid()
+    say "ULID (26)   : " + ulid_id
+    say "ULID Time ms: " + str(uuid::ulid_timestamp(ulid_id))
+    say "ULID Valid  : " + str(uuid::ulid_is_valid(ulid_id))
+    say "NanoID (21) : " + uuid::nanoid(21)
+    say "NanoID (12) : " + uuid::nanoid(12)
+    say ""
+    say "Done!"
 end
 
 main()
