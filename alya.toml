@@ -11,4 +11,4 @@ repository = "https://github.com/alya-lang/uuid"
 keywords = ["alya", "alya-lang", "package", "uuid", "uuidv4", "uuidv7", "ulid", "nanoid", "identifier"]
 
 [dependencies]
-rand = { git = "https://github.com/alya-lang/rand", tag = "v0.2.0" }
+rand = { git = "https://github.com/alya-lang/rand", tag = "v0.3.0" }
