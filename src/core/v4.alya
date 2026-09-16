@@ -3,6 +3,7 @@
 
 import "rand" as rand
 
+# Internal hex digit converter (private to module)
 function _v4_hex_digit(ch)
     let c = ord(ch)
     if c >= 48 and c <= 57
@@ -18,24 +19,24 @@ function _v4_hex_digit(ch)
 end
 
 # Generates standard 36-char RFC 4122 UUID v4: xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx
-function core_v4()
+pub function core_v4()
     let hex_chars = "0123456789abcdef"
     let raw_hex = rand::hex(32)
     let res = ""
     let i = 0
     while i < 32
-        if i == 8 or i == 12 or i == 16 or i == 20
-            res = res + "-"
+        if i in [8, 12, 16, 20]
+            res += "-"
         end
         if i == 12
-            res = res + "4"
+            res += "4"
         elif i == 16
             let orig = char_at(raw_hex, i)
             let v = _v4_hex_digit(orig)
             let masked = bit_or(bit_and(v, 3), 8)
-            res = res + char_at(hex_chars, masked)
+            res += char_at(hex_chars, masked)
         else
-            res = res + char_at(raw_hex, i)
+            res += char_at(raw_hex, i)
         end
         i += 1
     end
@@ -43,21 +44,21 @@ function core_v4()
 end
 
 # Generates 32-character hex UUID v4 without hyphens
-function core_v4_simple()
+pub function core_v4_simple()
     let hex_chars = "0123456789abcdef"
     let raw_hex = rand::hex(32)
     let res = ""
     let i = 0
     while i < 32
         if i == 12
-            res = res + "4"
+            res += "4"
         elif i == 16
             let orig = char_at(raw_hex, i)
             let v = _v4_hex_digit(orig)
             let masked = bit_or(bit_and(v, 3), 8)
-            res = res + char_at(hex_chars, masked)
+            res += char_at(hex_chars, masked)
         else
-            res = res + char_at(raw_hex, i)
+            res += char_at(raw_hex, i)
         end
         i += 1
     end

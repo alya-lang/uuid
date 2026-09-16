@@ -1,17 +1,30 @@
 # Types and data structures for uuid
 # Part of the Alya Language package ecosystem (https://github.com/alya-lang)
 
+# Public enumeration for UUID versions (exported via pub)
+pub enum UuidVersion
+    Unknown = 0,
+    V1 = 1,
+    V2 = 2,
+    V3 = 3,
+    V4 = 4,
+    V5 = 5,
+    V6 = 6,
+    V7 = 7,
+    V8 = 8
+end
+
 # Parsed UUID struct representation
-struct Uuid
-    raw
-    version
-    is_valid
+pub struct Uuid
+    raw,
+    version,
+    is_valid,
     bytes
 end
 
 # Parsed ULID struct representation
-struct UlidInfo
-    raw
-    timestamp_ms
+pub struct UlidInfo
+    raw,
+    timestamp_ms,
     is_valid
 end

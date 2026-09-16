@@ -4,7 +4,7 @@
 import "rand" as rand
 
 # Generates URL-safe NanoID of specified size (default 21)
-function core_nanoid(size = 21, alphabet = "_-0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
+pub function core_nanoid(size = 21, alphabet = "_-0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
     if size <= 0
         return ""
     end

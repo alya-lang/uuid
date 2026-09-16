@@ -3,6 +3,7 @@
 
 import "rand" as rand
 
+# Internal Crockford Base32 character decoder (private to module)
 function _crockford_val(ch)
     let c = ord(ch)
     if c >= 48 and c <= 57
@@ -42,7 +43,7 @@ function _crockford_val(ch)
 end
 
 # Generates 26-char ULID for given millisecond timestamp
-function core_ulid_at(timestamp_ms)
+pub function core_ulid_at(timestamp_ms)
     let crockford = "0123456789ABCDEFGHJKMNPQRSTVWXYZ"
     let time_rev = []
     let temp = timestamp_ms
@@ -56,7 +57,7 @@ function core_ulid_at(timestamp_ms)
     let res = ""
     let j = 9
     while j >= 0
-        res = res + time_rev[j]
+        res += time_rev[j]
         j -= 1
     end
     let rand_chars = rand::string(16, crockford)
@@ -64,13 +65,13 @@ function core_ulid_at(timestamp_ms)
 end
 
 # Generates 26-char ULID using current system time
-function core_ulid()
+pub function core_ulid()
     let now_ms = (time() * 1000) + (clock_ms() % 1000)
     return core_ulid_at(now_ms)
 end
 
 # Decodes 48-bit millisecond timestamp from ULID string
-function core_ulid_timestamp(ulid_str)
+pub function core_ulid_timestamp(ulid_str)
     if len(ulid_str) < 10
         return 0
     end
@@ -89,7 +90,7 @@ function core_ulid_timestamp(ulid_str)
 end
 
 # Validates whether string is a valid 26-char Crockford Base32 ULID
-function core_ulid_is_valid(s)
+pub function core_ulid_is_valid(s)
     if len(s) != 26
         return 0
     end

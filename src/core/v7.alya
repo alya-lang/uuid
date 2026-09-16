@@ -3,6 +3,7 @@
 
 import "rand" as rand
 
+# Internal hex digit converter (private to module)
 function _v7_hex_digit(ch)
     let c = ord(ch)
     if c >= 48 and c <= 57
@@ -17,7 +18,7 @@ function _v7_hex_digit(ch)
     return 0
 end
 
-# Converts 48-bit millisecond timestamp to 12 hex characters
+# Converts 48-bit millisecond timestamp to 12 hex characters (private to module)
 function _v7_hex_time(ms)
     let hex_chars = "0123456789abcdef"
     let hex_rev = []
@@ -32,53 +33,53 @@ function _v7_hex_time(ms)
     let res = ""
     let j = 11
     while j >= 0
-        res = res + hex_rev[j]
+        res += hex_rev[j]
         j -= 1
     end
     return res
 end
 
 # Generates 36-character standard UUID v7 for a given millisecond timestamp
-function core_v7_at(timestamp_ms)
+pub function core_v7_at(timestamp_ms)
     let hex_chars = "0123456789abcdef"
     let time_hex = _v7_hex_time(timestamp_ms)
     let rand_part = rand::hex(20)
     let res = ""
     let i = 0
     while i < 8
-        res = res + char_at(time_hex, i)
+        res += char_at(time_hex, i)
         i += 1
     end
-    res = res + "-"
+    res += "-"
     while i < 12
-        res = res + char_at(time_hex, i)
+        res += char_at(time_hex, i)
         i += 1
     end
-    res = res + "-7"
+    res += "-7"
     res = res + char_at(rand_part, 0) + char_at(rand_part, 1) + char_at(rand_part, 2)
-    res = res + "-"
+    res += "-"
     let orig = char_at(rand_part, 3)
     let v = _v7_hex_digit(orig)
     let variant_digit = bit_or(bit_and(v, 3), 8)
     res = res + char_at(hex_chars, variant_digit)
     res = res + char_at(rand_part, 4) + char_at(rand_part, 5) + char_at(rand_part, 6)
-    res = res + "-"
+    res += "-"
     let k = 7
     while k < 19
-        res = res + char_at(rand_part, k)
+        res += char_at(rand_part, k)
         k += 1
     end
     return res
 end
 
 # Generates 36-character standard UUID v7 using current system time
-function core_v7()
+pub function core_v7()
     let now_ms = (time() * 1000) + (clock_ms() % 1000)
     return core_v7_at(now_ms)
 end
 
 # Generates 32-character hex UUID v7 without hyphens for a given millisecond timestamp
-function core_v7_simple_at(timestamp_ms)
+pub function core_v7_simple_at(timestamp_ms)
     let hex_chars = "0123456789abcdef"
     let time_hex = _v7_hex_time(timestamp_ms)
     let rand_part = rand::hex(20)
@@ -86,17 +87,17 @@ function core_v7_simple_at(timestamp_ms)
     let orig = char_at(rand_part, 3)
     let v = _v7_hex_digit(orig)
     let variant_digit = bit_or(bit_and(v, 3), 8)
-    res = res + char_at(hex_chars, variant_digit)
+    res += char_at(hex_chars, variant_digit)
     let k = 4
     while k < 19
-        res = res + char_at(rand_part, k)
+        res += char_at(rand_part, k)
         k += 1
     end
     return res
 end
 
 # Generates 32-character hex UUID v7 without hyphens using current system time
-function core_v7_simple()
+pub function core_v7_simple()
     let now_ms = (time() * 1000) + (clock_ms() % 1000)
     return core_v7_simple_at(now_ms)
 end
