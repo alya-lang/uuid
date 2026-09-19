@@ -1,6 +1,6 @@
 [package]
 name = "uuid"
-version = "0.4.0"
+version = "0.1.0"
 alya-version = "0.0.18"
 entry = "src/lib.alya"
 description = "RFC 4122 UUID v4, RFC 9562 UUID v7, ULID, and NanoID toolkit for Alya"
@@ -11,4 +11,4 @@ repository = "https://github.com/alya-lang/uuid"
 keywords = ["alya", "alya-lang", "package", "uuid", "uuidv4", "uuidv7", "ulid", "nanoid", "identifier"]
 
 [dependencies]
-rand = { git = "https://github.com/alya-lang/rand", tag = "v0.3.0" }
+rand = { git = "https://github.com/alya-lang/rand", tag = "v0.1.0" }
