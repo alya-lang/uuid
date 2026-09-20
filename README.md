@@ -142,10 +142,10 @@ main()
 
 ## 🧪 Running Tests & Benchmarks
 
-Run the test suite using `alya`:
+Run the automated test suite:
 
 ```bash
-alya run tests/test_basic.alya
+alya test
 ```
 
 Run the benchmark suite:
@@ -160,7 +160,18 @@ Run the example demo:
 alya run examples/demo.alya
 ```
 
----
+Check code formatting:
+
+```bash
+alya fmt . --check
+```
+
+Run static code linter:
+
+```bash
+alya lint . --check
+```
+
 
 ## 🤝 Contributing
 
