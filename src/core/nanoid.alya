@@ -1,10 +1,24 @@
-# nanoid.alya - Compact, URL-friendly unique string identifier generator
-# Part of the Alya Language package ecosystem (https://github.com/alya-lang)
+## # uuid/core/nanoid
+##
+## Compact, URL-friendly unique string identifier generator.
+## Part of the Alya Language package ecosystem (https://github.com/alya-lang).
 
 import "rand" as rand
 
-# Generates URL-safe NanoID of specified size (default 21)
-pub function core_nanoid(size = 21, alphabet = "_-0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
+## Generates a URL-safe NanoID of the specified size.
+##
+## ### Parameters
+## - `size`: Identifier length. Defaults to `21`.
+## - `alphabet`: Sampling alphabet string. Defaults to URL-friendly symbols.
+##
+## ### Returns
+## The generated NanoID string (empty when `size` is not positive).
+##
+## ### Examples
+## ```alya
+## let id = core_nanoid(10)
+## ```
+pub function core_nanoid(size: int = 21, alphabet: string = "_-0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ") -> string
     if size <= 0
         return ""
     end

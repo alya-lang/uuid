@@ -1,25 +1,33 @@
-# v4.alya - RFC 4122 UUID Version 4 Generator
-# Part of the Alya Language package ecosystem (https://github.com/alya-lang)
+## # uuid/core/v4
+##
+## RFC 4122 UUID version 4 generator.
+## Part of the Alya Language package ecosystem (https://github.com/alya-lang).
 
 import "rand" as rand
 
-# Internal hex digit converter (private to module)
-function _v4_hex_digit(ch)
+# Internal hex digit converter (private to module).
+function _v4_hex_digit(ch: string) -> int
     let c = ord(ch)
-    if c >= 48 and c <= 57
-        return c - 48
+    return when c
+        is 48..57  => c - 48
+        is 97..102 => c - 87
+        is 65..70  => c - 55
+        else       => 0
     end
-    if c >= 97 and c <= 102
-        return c - 87
-    end
-    if c >= 65 and c <= 70
-        return c - 55
-    end
-    return 0
 end
 
-# Generates standard 36-char RFC 4122 UUID v4: xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx
-pub function core_v4()
+## Generates a standard 36-character RFC 4122 UUID v4.
+##
+## Layout: `xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx` with RFC variant bits.
+##
+## ### Returns
+## The generated UUID v4 string.
+##
+## ### Examples
+## ```alya
+## let id = core_v4()
+## ```
+pub function core_v4() -> string
     let hex_chars = "0123456789abcdef"
     let raw_hex = rand::hex(32)
     let res = ""
@@ -43,8 +51,11 @@ pub function core_v4()
     return res
 end
 
-# Generates 32-character hex UUID v4 without hyphens
-pub function core_v4_simple()
+## Generates a 32-character hex UUID v4 without hyphens.
+##
+## ### Returns
+## The generated simple UUID v4 string.
+pub function core_v4_simple() -> string
     let hex_chars = "0123456789abcdef"
     let raw_hex = rand::hex(32)
     let res = ""

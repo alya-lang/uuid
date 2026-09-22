@@ -1,34 +1,43 @@
-# parse.alya - Validation, parsing, and inspection utilities for UUIDs
-# Part of the Alya Language package ecosystem (https://github.com/alya-lang)
+## # uuid/core/parse
+##
+## Validation, parsing, and inspection utilities for UUIDs.
+## Part of the Alya Language package ecosystem (https://github.com/alya-lang).
 
 import "../types.alya"
 
-# Internal hex character check (private to module)
-function _is_hex_char(ch)
+# Internal hex character check (private to module).
+function _is_hex_char(ch: string) -> int
     let c = ord(ch)
-    if (c >= 48 and c <= 57) or (c >= 97 and c <= 102) or (c >= 65 and c <= 70)
-        return 1
+    return when
+        (c >= 48 and c <= 57) or (c >= 97 and c <= 102) or (c >= 65 and c <= 70) => 1
+        else => 0
     end
-    return 0
 end
 
-# Internal hex digit to integer converter (private to module)
-function _hex_to_int(ch)
+# Internal hex digit to integer converter (private to module).
+function _hex_to_int(ch: string) -> int
     let c = ord(ch)
-    if c >= 48 and c <= 57
-        return c - 48
+    return when c
+        is 48..57  => c - 48
+        is 97..102 => c - 87
+        is 65..70  => c - 55
+        else       => 0
     end
-    if c >= 97 and c <= 102
-        return c - 87
-    end
-    if c >= 65 and c <= 70
-        return c - 55
-    end
-    return 0
 end
 
-# Validates if string is a valid UUID (standard 36-char or simple 32-char)
-pub function core_is_valid(s)
+## Validates whether a string is a UUID (standard 36-char or simple 32-char).
+##
+## ### Parameters
+## - `s`: Candidate string.
+##
+## ### Returns
+## `1` when valid, `0` otherwise.
+##
+## ### Examples
+## ```alya
+## say core_is_valid("00000000-0000-0000-0000-000000000000") # 1
+## ```
+pub function core_is_valid(s: string) -> int
     let slen = len(s)
     if slen == 36
         if char_at(s, 8) != "-" or char_at(s, 13) != "-" or char_at(s, 18) != "-" or char_at(s, 23) != "-"
@@ -58,24 +67,42 @@ pub function core_is_valid(s)
     return 0
 end
 
-# Checks if UUID is the Nil UUID (all zeroes)
-pub function core_is_nil(s)
+## Checks whether a UUID is the Nil UUID (all zeroes).
+##
+## ### Parameters
+## - `s`: Candidate UUID string.
+##
+## ### Returns
+## `1` when nil, `0` otherwise.
+pub function core_is_nil(s: string) -> int
     if s == "00000000-0000-0000-0000-000000000000" or s == "00000000000000000000000000000000"
         return 1
     end
     return 0
 end
 
-# Checks if UUID is the Max UUID (all ones / ffff...)
-pub function core_is_max(s)
+## Checks whether a UUID is the Max UUID (all `f` digits).
+##
+## ### Parameters
+## - `s`: Candidate UUID string.
+##
+## ### Returns
+## `1` when max, `0` otherwise.
+pub function core_is_max(s: string) -> int
     if s == "ffffffff-ffff-ffff-ffff-ffffffffffff" or s == "FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF" or s == "ffffffffffffffffffffffffffffffff" or s == "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
         return 1
     end
     return 0
 end
 
-# Extracts UUID version (e.g. 4 or 7) as an integer. Returns 0 if invalid.
-pub function core_version(s)
+## Extracts the UUID version as an integer, or `0` when invalid.
+##
+## ### Parameters
+## - `s`: Candidate UUID string.
+##
+## ### Returns
+## Version number (e.g. `4` or `7`), or `0` when invalid.
+pub function core_version(s: string) -> int
     if core_is_valid(s) == 0
         return UuidVersion.Unknown
     end
@@ -100,8 +127,14 @@ pub function core_version(s)
     end
 end
 
-# Extracts Unix timestamp in milliseconds from a UUID v7 string. Returns 0 if not v7.
-pub function core_timestamp(s)
+## Extracts the Unix millisecond timestamp from a UUID v7 string.
+##
+## ### Parameters
+## - `s`: Candidate UUID string.
+##
+## ### Returns
+## Millisecond timestamp integer (`0` when not a valid v7).
+pub function core_timestamp(s: string) -> int
     if core_is_valid(s) == 0
         return 0
     end
@@ -140,8 +173,14 @@ pub function core_timestamp(s)
     return ts
 end
 
-# Converts UUID string into an array of 16 byte integers (0..255)
-pub function core_to_bytes(s)
+## Converts a UUID string into an array of 16 byte integers (`0..255`).
+##
+## ### Parameters
+## - `s`: Candidate UUID string.
+##
+## ### Returns
+## Byte array (empty when invalid).
+pub function core_to_bytes(s: string) -> array
     if core_is_valid(s) == 0
         return []
     end
@@ -167,8 +206,14 @@ pub function core_to_bytes(s)
     return bytes
 end
 
-# Formats 32-char hex string into 36-char standard UUID string
-pub function core_to_standard(simple_hex)
+## Formats a 32-character hex string into a 36-character standard UUID.
+##
+## ### Parameters
+## - `simple_hex`: 32-character hex string.
+##
+## ### Returns
+## Standard UUID string (input returned unchanged when not 32 chars).
+pub function core_to_standard(simple_hex: string) -> string
     if len(simple_hex) != 32
         return simple_hex
     end
@@ -184,8 +229,14 @@ pub function core_to_standard(simple_hex)
     return res
 end
 
-# Constructs standard 36-char UUID string from 16 byte integers
-pub function core_from_bytes(bytes)
+## Constructs a standard 36-character UUID string from 16 byte integers.
+##
+## ### Parameters
+## - `bytes`: Array of 16 byte integers.
+##
+## ### Returns
+## Standard UUID string (Nil UUID when fewer than 16 bytes).
+pub function core_from_bytes(bytes: array) -> string
     if len(bytes) < 16
         return "00000000-0000-0000-0000-000000000000"
     end
@@ -203,8 +254,14 @@ pub function core_from_bytes(bytes)
     return core_to_standard(hex_str)
 end
 
-# Converts 36-char standard UUID to 32-char simple hex string (without hyphens)
-pub function core_to_simple(s)
+## Converts a 36-character standard UUID to a 32-character simple hex string.
+##
+## ### Parameters
+## - `s`: Standard UUID string.
+##
+## ### Returns
+## Hyphen-free hex string.
+pub function core_to_simple(s: string) -> string
     let res = ""
     let slen = len(s)
     let i = 0
@@ -218,17 +275,34 @@ pub function core_to_simple(s)
     return res
 end
 
-# Formats UUID as RFC 4122 URN (urn:uuid:...)
-pub function core_to_urn(s)
+## Formats a UUID as an RFC 4122 URN (`urn:uuid:...`).
+##
+## ### Parameters
+## - `s`: Standard (36-char) or simple (32-char) UUID string.
+##
+## ### Returns
+## The URN string.
+##
+## ### Examples
+## ```alya
+## say core_to_urn("00000000-0000-0000-0000-000000000000")
+## ```
+pub function core_to_urn(s: string) -> string
     let std = s
     if len(s) == 32
         std = core_to_standard(s)
     end
-    return "urn:uuid:" + std
+    return "urn:uuid:{std}"
 end
 
-# Parses a UUID string into a Uuid struct
-pub function core_parse_uuid(s)
+## Parses a UUID string into a `Uuid` struct.
+##
+## ### Parameters
+## - `s`: Candidate UUID string.
+##
+## ### Returns
+## The parsed `Uuid` instance (`is_valid` is `0` when malformed).
+pub function core_parse_uuid(s: string) -> Uuid
     let valid = core_is_valid(s)
     if valid == 0
         return Uuid {

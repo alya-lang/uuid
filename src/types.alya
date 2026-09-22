@@ -1,7 +1,13 @@
-# Types and data structures for uuid
-# Part of the Alya Language package ecosystem (https://github.com/alya-lang)
+## # uuid/types
+##
+## Types and data structures for UUID.
+## Part of the Alya Language package ecosystem (https://github.com/alya-lang).
+##
+## Defines version discriminators and parsed UUID/ULID representations.
 
-# Public enumeration for UUID versions (exported via pub)
+## Public enumeration for UUID versions.
+##
+## Covers the Unknown sentinel plus registered versions 1-8.
 pub enum UuidVersion
     Unknown = 0,
     V1 = 1,
@@ -14,17 +20,28 @@ pub enum UuidVersion
     V8 = 8
 end
 
-# Parsed UUID struct representation
+## Parsed UUID struct representation.
+##
+## ### Fields
+## - `raw`: Original UUID string.
+## - `version`: `UuidVersion` value detected from the payload.
+## - `is_valid`: `1` when the payload is well-formed, `0` otherwise.
+## - `bytes`: Array of 16 byte integers (empty when invalid).
 pub struct Uuid
-    raw,
-    version,
-    is_valid,
-    bytes
+    raw: string,
+    version: int,
+    is_valid: int,
+    bytes: array
 end
 
-# Parsed ULID struct representation
+## Parsed ULID struct representation.
+##
+## ### Fields
+## - `raw`: Original ULID string.
+## - `timestamp_ms`: Decoded 48-bit millisecond timestamp.
+## - `is_valid`: `1` when the payload is well-formed, `0` otherwise.
 pub struct UlidInfo
-    raw,
-    timestamp_ms,
-    is_valid
+    raw: string,
+    timestamp_ms: int,
+    is_valid: int
 end

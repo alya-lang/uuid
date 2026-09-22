@@ -1,5 +1,10 @@
-# lib.alya - Public API Facade for uuid package
-# Part of the Alya Language package ecosystem (https://github.com/alya-lang)
+## # uuid
+##
+## Public API facade for the uuid package.
+## Part of the Alya Language package ecosystem (https://github.com/alya-lang).
+##
+## Exposes RFC 4122 UUID v4, RFC 9562 UUID v7, ULID, and NanoID generation
+## alongside validation, inspection, conversion, and struct ergonomics.
 
 import "./types.alya"
 import "./core/v4.alya"
@@ -8,12 +13,23 @@ import "./core/ulid.alya"
 import "./core/nanoid.alya"
 import "./core/parse.alya"
 
+# ───────────────────────────────────────────────────────────────
 # Constants
-pub function nil_uuid()
+# ───────────────────────────────────────────────────────────────
+
+## Returns the Nil UUID (`00000000-...-000000000000`).
+##
+## ### Returns
+## The Nil UUID string.
+pub function nil_uuid() -> string
     return "00000000-0000-0000-0000-000000000000"
 end
 
-pub function max_uuid()
+## Returns the Max UUID (`ffffffff-...-ffffffffffff`).
+##
+## ### Returns
+## The Max UUID string.
+pub function max_uuid() -> string
     return "ffffffff-ffff-ffff-ffff-ffffffffffff"
 end
 
@@ -21,33 +37,62 @@ end
 # 1. UUID Generation (RFC 4122 v4 & RFC 9562 v7)
 # ═══════════════════════════════════════════════════════════════
 
-# Generates standard 36-character RFC 4122 UUID v4
-pub function v4()
+## Generates a standard 36-character RFC 4122 UUID v4.
+##
+## ### Returns
+## The generated UUID v4 string.
+##
+## ### Examples
+## ```alya
+## let id = v4()
+## ```
+pub function v4() -> string
     return core_v4()
 end
 
-# Generates 32-character hex UUID v4 without hyphens
-pub function v4_simple()
+## Generates a 32-character hex UUID v4 without hyphens.
+##
+## ### Returns
+## The generated simple UUID v4 string.
+pub function v4_simple() -> string
     return core_v4_simple()
 end
 
-# Generates standard 36-character RFC 9562 UUID v7 using current system time
-pub function v7()
+## Generates a standard 36-character RFC 9562 UUID v7 using current time.
+##
+## ### Returns
+## The generated UUID v7 string.
+pub function v7() -> string
     return core_v7()
 end
 
-# Generates standard 36-character RFC 9562 UUID v7 for given timestamp (in ms)
-pub function v7_at(timestamp_ms)
+## Generates a standard 36-character RFC 9562 UUID v7 for a timestamp.
+##
+## ### Parameters
+## - `timestamp_ms`: Unix timestamp in milliseconds.
+##
+## ### Returns
+## The generated UUID v7 string.
+pub function v7_at(timestamp_ms: int) -> string
     return core_v7_at(timestamp_ms)
 end
 
-# Generates 32-character hex UUID v7 without hyphens using current system time
-pub function v7_simple()
+## Generates a 32-character hex UUID v7 without hyphens using current time.
+##
+## ### Returns
+## The generated simple UUID v7 string.
+pub function v7_simple() -> string
     return core_v7_simple()
 end
 
-# Generates 32-character hex UUID v7 without hyphens for given timestamp (in ms)
-pub function v7_simple_at(timestamp_ms)
+## Generates a 32-character hex UUID v7 without hyphens for a timestamp.
+##
+## ### Parameters
+## - `timestamp_ms`: Unix timestamp in milliseconds.
+##
+## ### Returns
+## The generated simple UUID v7 string.
+pub function v7_simple_at(timestamp_ms: int) -> string
     return core_v7_simple_at(timestamp_ms)
 end
 
@@ -55,28 +100,56 @@ end
 # 2. ULID & NanoID Generation
 # ═══════════════════════════════════════════════════════════════
 
-# Generates 26-character Crockford Base32 ULID
-pub function ulid()
+## Generates a 26-character Crockford Base32 ULID using current time.
+##
+## ### Returns
+## The generated ULID string.
+pub function ulid() -> string
     return core_ulid()
 end
 
-# Generates 26-character Crockford Base32 ULID for given timestamp (in ms)
-pub function ulid_at(timestamp_ms)
+## Generates a 26-character Crockford Base32 ULID for a timestamp.
+##
+## ### Parameters
+## - `timestamp_ms`: Unix timestamp in milliseconds.
+##
+## ### Returns
+## The generated ULID string.
+pub function ulid_at(timestamp_ms: int) -> string
     return core_ulid_at(timestamp_ms)
 end
 
-# Decodes 48-bit millisecond timestamp from ULID string
-pub function ulid_timestamp(ulid_str)
+## Decodes the 48-bit millisecond timestamp from a ULID string.
+##
+## ### Parameters
+## - `ulid_str`: ULID string to decode.
+##
+## ### Returns
+## The millisecond timestamp integer (`0` when malformed).
+pub function ulid_timestamp(ulid_str: string) -> int
     return core_ulid_timestamp(ulid_str)
 end
 
-# Validates if string is a valid 26-character ULID
-pub function ulid_is_valid(ulid_str)
+## Validates whether a string is a valid 26-character ULID.
+##
+## ### Parameters
+## - `ulid_str`: Candidate string.
+##
+## ### Returns
+## `1` when valid, `0` otherwise.
+pub function ulid_is_valid(ulid_str: string) -> int
     return core_ulid_is_valid(ulid_str)
 end
 
-# Generates URL-friendly NanoID of given size
-pub function nanoid(size = 21, alphabet = "_-0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
+## Generates a URL-friendly NanoID of the given size.
+##
+## ### Parameters
+## - `size`: Identifier length. Defaults to `21`.
+## - `alphabet`: Sampling alphabet string. Defaults to URL-friendly symbols.
+##
+## ### Returns
+## The generated NanoID string.
+pub function nanoid(size: int = 21, alphabet: string = "_-0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ") -> string
     return core_nanoid(size, alphabet)
 end
 
@@ -84,62 +157,135 @@ end
 # 3. Validation, Inspection & Parsing
 # ═══════════════════════════════════════════════════════════════
 
-# Returns 1 if string is a valid 36-char standard or 32-char simple UUID, else 0
-pub function is_valid(s)
+## Returns `1` when a string is a valid 36-char or 32-char UUID.
+##
+## ### Parameters
+## - `s`: Candidate string.
+##
+## ### Returns
+## `1` when valid, `0` otherwise.
+pub function is_valid(s: string) -> int
     return core_is_valid(s)
 end
 
-# Returns 1 if UUID is the Nil UUID, else 0
-pub function is_nil(s)
+## Returns `1` when a UUID is the Nil UUID.
+##
+## ### Parameters
+## - `s`: Candidate UUID string.
+##
+## ### Returns
+## `1` when nil, `0` otherwise.
+pub function is_nil(s: string) -> int
     return core_is_nil(s)
 end
 
-# Returns 1 if UUID is the Max UUID, else 0
-pub function is_max(s)
+## Returns `1` when a UUID is the Max UUID.
+##
+## ### Parameters
+## - `s`: Candidate UUID string.
+##
+## ### Returns
+## `1` when max, `0` otherwise.
+pub function is_max(s: string) -> int
     return core_is_max(s)
 end
 
-# Extracts UUID version (e.g. 4 or 7) as an integer. Returns 0 if invalid.
-pub function version(s)
+## Extracts the UUID version as an integer (`0` when invalid).
+##
+## ### Parameters
+## - `s`: Candidate UUID string.
+##
+## ### Returns
+## Version number (e.g. `4` or `7`), or `0` when invalid.
+pub function version(s: string) -> int
     return core_version(s)
 end
 
-# Extracts Unix timestamp in milliseconds from a UUID v7 string. Returns 0 if not v7.
-pub function get_timestamp(s)
+## Extracts the Unix millisecond timestamp from a UUID v7 string.
+##
+## ### Parameters
+## - `s`: Candidate UUID string.
+##
+## ### Returns
+## Millisecond timestamp integer (`0` when not a valid v7).
+pub function get_timestamp(s: string) -> int
     return core_timestamp(s)
 end
 
-pub function extract_timestamp(s)
+## Alias for `get_timestamp`.
+##
+## ### Parameters
+## - `s`: Candidate UUID string.
+##
+## ### Returns
+## Millisecond timestamp integer (`0` when not a valid v7).
+pub function extract_timestamp(s: string) -> int
     return core_timestamp(s)
 end
 
-# Converts UUID string into an array of 16 byte integers (0..255)
-pub function to_bytes(s)
+## Converts a UUID string into an array of 16 byte integers (`0..255`).
+##
+## ### Parameters
+## - `s`: Candidate UUID string.
+##
+## ### Returns
+## Byte array (empty when invalid).
+pub function to_bytes(s: string) -> array
     return core_to_bytes(s)
 end
 
-# Constructs standard 36-character UUID string from 16 byte integers
-pub function from_bytes(bytes)
+## Constructs a standard 36-character UUID string from 16 byte integers.
+##
+## ### Parameters
+## - `bytes`: Array of 16 byte integers.
+##
+## ### Returns
+## Standard UUID string (Nil UUID when fewer than 16 bytes).
+pub function from_bytes(bytes: array) -> string
     return core_from_bytes(bytes)
 end
 
-# Converts 36-character UUID to 32-character simple hex string
-pub function to_simple(s)
+## Converts a 36-character UUID to a 32-character simple hex string.
+##
+## ### Parameters
+## - `s`: Standard UUID string.
+##
+## ### Returns
+## Hyphen-free hex string.
+pub function to_simple(s: string) -> string
     return core_to_simple(s)
 end
 
-# Converts 32-character simple hex string to 36-character standard UUID
-pub function to_standard(simple_hex)
+## Converts a 32-character simple hex string to a standard UUID.
+##
+## ### Parameters
+## - `simple_hex`: 32-character hex string.
+##
+## ### Returns
+## Standard UUID string (input unchanged when not 32 chars).
+pub function to_standard(simple_hex: string) -> string
     return core_to_standard(simple_hex)
 end
 
-# Formats UUID as RFC 4122 URN (urn:uuid:...)
-pub function to_urn(s)
+## Formats a UUID as an RFC 4122 URN (`urn:uuid:...`).
+##
+## ### Parameters
+## - `s`: Standard (36-char) or simple (32-char) UUID string.
+##
+## ### Returns
+## The URN string.
+pub function to_urn(s: string) -> string
     return core_to_urn(s)
 end
 
-# Parses a UUID string into a Uuid struct
-pub function parse(s)
+## Parses a UUID string into a `Uuid` struct.
+##
+## ### Parameters
+## - `s`: Candidate UUID string.
+##
+## ### Returns
+## The parsed `Uuid` instance (`is_valid` is `0` when malformed).
+pub function parse(s: string) -> Uuid
     return core_parse_uuid(s)
 end
 
@@ -147,30 +293,79 @@ end
 # 4. Idiomatic Struct Methods on Uuid
 # ═══════════════════════════════════════════════════════════════
 
-pub function Uuid.to_string(self)
+## Returns the raw UUID string.
+##
+## ### Parameters
+## - `self`: The target `Uuid` instance.
+##
+## ### Returns
+## The raw UUID string.
+pub function Uuid.to_string(self: Uuid) -> string
     return self.raw
 end
 
-pub function Uuid.to_simple(self)
+## Returns the hyphen-free hex form of this UUID.
+##
+## ### Parameters
+## - `self`: The target `Uuid` instance.
+##
+## ### Returns
+## Hyphen-free hex string.
+pub function Uuid.to_simple(self: Uuid) -> string
     return core_to_simple(self.raw)
 end
 
-pub function Uuid.to_urn(self)
+## Returns the RFC 4122 URN form of this UUID.
+##
+## ### Parameters
+## - `self`: The target `Uuid` instance.
+##
+## ### Returns
+## The URN string.
+pub function Uuid.to_urn(self: Uuid) -> string
     return core_to_urn(self.raw)
 end
 
-pub function Uuid.is_nil(self)
+## Returns `1` when this UUID is the Nil UUID.
+##
+## ### Parameters
+## - `self`: The target `Uuid` instance.
+##
+## ### Returns
+## `1` when nil, `0` otherwise.
+pub function Uuid.is_nil(self: Uuid) -> int
     return core_is_nil(self.raw)
 end
 
-pub function Uuid.is_max(self)
+## Returns `1` when this UUID is the Max UUID.
+##
+## ### Parameters
+## - `self`: The target `Uuid` instance.
+##
+## ### Returns
+## `1` when max, `0` otherwise.
+pub function Uuid.is_max(self: Uuid) -> int
     return core_is_max(self.raw)
 end
 
-pub function Uuid.get_timestamp(self)
+## Extracts the Unix millisecond timestamp from this UUID v7.
+##
+## ### Parameters
+## - `self`: The target `Uuid` instance.
+##
+## ### Returns
+## Millisecond timestamp integer (`0` when not a valid v7).
+pub function Uuid.get_timestamp(self: Uuid) -> int
     return core_timestamp(self.raw)
 end
 
-pub function Uuid.to_bytes(self)
+## Returns the 16-byte array of this UUID.
+##
+## ### Parameters
+## - `self`: The target `Uuid` instance.
+##
+## ### Returns
+## Byte array (empty when invalid).
+pub function Uuid.to_bytes(self: Uuid) -> array
     return self.bytes
 end

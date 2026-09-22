@@ -1,25 +1,23 @@
-# v7.alya - RFC 9562 UUID Version 7 Generator (Time-ordered)
-# Part of the Alya Language package ecosystem (https://github.com/alya-lang)
+## # uuid/core/v7
+##
+## RFC 9562 UUID version 7 generator (time-ordered).
+## Part of the Alya Language package ecosystem (https://github.com/alya-lang).
 
 import "rand" as rand
 
-# Internal hex digit converter (private to module)
-function _v7_hex_digit(ch)
+# Internal hex digit converter (private to module).
+function _v7_hex_digit(ch: string) -> int
     let c = ord(ch)
-    if c >= 48 and c <= 57
-        return c - 48
+    return when c
+        is 48..57  => c - 48
+        is 97..102 => c - 87
+        is 65..70  => c - 55
+        else       => 0
     end
-    if c >= 97 and c <= 102
-        return c - 87
-    end
-    if c >= 65 and c <= 70
-        return c - 55
-    end
-    return 0
 end
 
-# Converts 48-bit millisecond timestamp to 12 hex characters (private to module)
-function _v7_hex_time(ms)
+# Converts a 48-bit millisecond timestamp to 12 hex characters (private to module).
+function _v7_hex_time(ms: int) -> string
     let hex_chars = "0123456789abcdef"
     let hex_rev = []
     let temp = ms
@@ -39,8 +37,14 @@ function _v7_hex_time(ms)
     return res
 end
 
-# Generates 36-character standard UUID v7 for a given millisecond timestamp
-pub function core_v7_at(timestamp_ms)
+## Generates a 36-character standard UUID v7 for a given millisecond timestamp.
+##
+## ### Parameters
+## - `timestamp_ms`: Unix timestamp in milliseconds.
+##
+## ### Returns
+## The generated UUID v7 string.
+pub function core_v7_at(timestamp_ms: int) -> string
     let hex_chars = "0123456789abcdef"
     let time_hex = _v7_hex_time(timestamp_ms)
     let rand_part = rand::hex(20)
@@ -72,14 +76,23 @@ pub function core_v7_at(timestamp_ms)
     return res
 end
 
-# Generates 36-character standard UUID v7 using current system time
-pub function core_v7()
+## Generates a 36-character standard UUID v7 using current system time.
+##
+## ### Returns
+## The generated UUID v7 string.
+pub function core_v7() -> string
     let now_ms = (time() * 1000) + (clock_ms() % 1000)
     return core_v7_at(now_ms)
 end
 
-# Generates 32-character hex UUID v7 without hyphens for a given millisecond timestamp
-pub function core_v7_simple_at(timestamp_ms)
+## Generates a 32-character hex UUID v7 without hyphens for a timestamp.
+##
+## ### Parameters
+## - `timestamp_ms`: Unix timestamp in milliseconds.
+##
+## ### Returns
+## The generated simple UUID v7 string.
+pub function core_v7_simple_at(timestamp_ms: int) -> string
     let hex_chars = "0123456789abcdef"
     let time_hex = _v7_hex_time(timestamp_ms)
     let rand_part = rand::hex(20)
@@ -96,8 +109,11 @@ pub function core_v7_simple_at(timestamp_ms)
     return res
 end
 
-# Generates 32-character hex UUID v7 without hyphens using current system time
-pub function core_v7_simple()
+## Generates a 32-character hex UUID v7 without hyphens using current time.
+##
+## ### Returns
+## The generated simple UUID v7 string.
+pub function core_v7_simple() -> string
     let now_ms = (time() * 1000) + (clock_ms() % 1000)
     return core_v7_simple_at(now_ms)
 end

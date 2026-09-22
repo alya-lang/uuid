@@ -1,4 +1,9 @@
-# demo.alya - Showcase for uuid package
+## Demo of the uuid package
+##
+## Showcases UUID v4/v7 generation, ULID, NanoID, validation, byte
+## serialization, and struct parsing ergonomics.
+## Part of the Alya Language package ecosystem (https://github.com/alya-lang)
+
 import "../src/lib.alya" as uuid
 
 function main()
@@ -8,48 +13,66 @@ function main()
     # 1. UUID v4 Generation (Random)
     say "--- 1. UUID v4 (RFC 4122 Random) ---"
     let u4 = uuid::v4()
-    say "Standard v4 : " + u4
-    say "Simple v4   : " + uuid::v4_simple()
-    say "Version     : " + str(uuid::version(u4))
-    say "Is Valid    : " + str(uuid::is_valid(u4))
-    say "URN         : " + uuid::to_urn(u4)
+    let u4_ver = uuid::version(u4)
+    let u4_ok = uuid::is_valid(u4)
+    let u4_simple = uuid::v4_simple()
+    let u4_urn = uuid::to_urn(u4)
+    say "Standard v4 : {u4}"
+    say "Simple v4   : {u4_simple}"
+    say "Version     : {u4_ver}"
+    say "Is Valid    : {u4_ok}"
+    say "URN         : {u4_urn}"
     say ""
 
     # 2. UUID v7 Generation (Time-ordered)
     say "--- 2. UUID v7 (RFC 9562 Time-Ordered) ---"
     let u7 = uuid::v7()
-    say "Standard v7 : " + u7
-    say "Simple v7   : " + uuid::v7_simple()
-    say "Version     : " + str(uuid::version(u7))
-    say "Timestamp ms: " + str(uuid::get_timestamp(u7))
+    let u7_ver = uuid::version(u7)
+    let u7_ts = uuid::get_timestamp(u7)
+    let u7_simple = uuid::v7_simple()
+    say "Standard v7 : {u7}"
+    say "Simple v7   : {u7_simple}"
+    say "Version     : {u7_ver}"
+    say "Timestamp ms: {u7_ts}"
     say ""
 
     # 3. Special UUIDs & Validation
     say "--- 3. Special Values & Checks ---"
-    say "Nil UUID    : " + uuid::nil_uuid()
-    say "Max UUID    : " + uuid::max_uuid()
-    say "Is Nil(nil) : " + str(uuid::is_nil(uuid::nil_uuid()))
-    say "Is Max(max) : " + str(uuid::is_max(uuid::max_uuid()))
+    let nil_id = uuid::nil_uuid()
+    let max_id = uuid::max_uuid()
+    let nil_ok = uuid::is_nil(nil_id)
+    let max_ok = uuid::is_max(max_id)
+    say "Nil UUID    : {nil_id}"
+    say "Max UUID    : {max_id}"
+    say "Is Nil(nil) : {nil_ok}"
+    say "Is Max(max) : {max_ok}"
     say ""
 
     # 4. Binary Serialization
     say "--- 4. Byte Serialization & Parsing ---"
     let bytes = uuid::to_bytes(u4)
-    say "Bytes count : " + str(len(bytes))
-    say "First byte  : " + str(bytes[0])
-    say "Restored    : " + uuid::from_bytes(bytes)
+    let byte_count = len(bytes)
+    let first_byte = bytes[0]
+    let restored = uuid::from_bytes(bytes)
+    say "Bytes count : {byte_count}"
+    say "First byte  : {first_byte}"
+    say "Restored    : {restored}"
     let p = uuid::parse(u7)
-    say "Parsed v7   : valid=" + str(p.is_valid) + ", ver=" + str(p.version)
+    say "Parsed v7   : valid={p.is_valid}, ver={p.version}"
     say ""
 
     # 5. ULID & NanoID
     say "--- 5. ULID & NanoID ---"
     let ulid_id = uuid::ulid()
-    say "ULID (26)   : " + ulid_id
-    say "ULID Time ms: " + str(uuid::ulid_timestamp(ulid_id))
-    say "ULID Valid  : " + str(uuid::ulid_is_valid(ulid_id))
-    say "NanoID (21) : " + uuid::nanoid(21)
-    say "NanoID (12) : " + uuid::nanoid(12)
+    let ulid_ts = uuid::ulid_timestamp(ulid_id)
+    let ulid_ok = uuid::ulid_is_valid(ulid_id)
+    let nano21 = uuid::nanoid(21)
+    let nano12 = uuid::nanoid(12)
+    say "ULID (26)   : {ulid_id}"
+    say "ULID Time ms: {ulid_ts}"
+    say "ULID Valid  : {ulid_ok}"
+    say "NanoID (21) : {nano21}"
+    say "NanoID (12) : {nano12}"
     say ""
     say "Done!"
 end
