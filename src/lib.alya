@@ -7,9 +7,13 @@
 ## alongside validation, inspection, conversion, and struct ergonomics.
 
 import "./types.alya"
+@cfg(feature = "rand")
 import "./core/v4.alya"
+@cfg(feature = "rand")
 import "./core/v7.alya"
+@cfg(feature = "rand")
 import "./core/ulid.alya"
+@cfg(feature = "rand")
 import "./core/nanoid.alya"
 import "./core/parse.alya"
 
@@ -46,6 +50,9 @@ end
 ## ```alya
 ## let id = v4()
 ## ```
+## Requires the `rand` feature (default-on).
+##
+@cfg(feature = "rand")
 pub function v4() -> string
     return core_v4()
 end
@@ -54,6 +61,9 @@ end
 ##
 ## ### Returns
 ## The generated simple UUID v4 string.
+## Requires the `rand` feature (default-on).
+##
+@cfg(feature = "rand")
 pub function v4_simple() -> string
     return core_v4_simple()
 end
@@ -62,6 +72,9 @@ end
 ##
 ## ### Returns
 ## The generated UUID v7 string.
+## Requires the `rand` feature (default-on).
+##
+@cfg(feature = "rand")
 pub function v7() -> string
     return core_v7()
 end
@@ -73,6 +86,9 @@ end
 ##
 ## ### Returns
 ## The generated UUID v7 string.
+## Requires the `rand` feature (default-on).
+##
+@cfg(feature = "rand")
 pub function v7_at(timestamp_ms: int) -> string
     return core_v7_at(timestamp_ms)
 end
@@ -81,6 +97,9 @@ end
 ##
 ## ### Returns
 ## The generated simple UUID v7 string.
+## Requires the `rand` feature (default-on).
+##
+@cfg(feature = "rand")
 pub function v7_simple() -> string
     return core_v7_simple()
 end
@@ -92,6 +111,9 @@ end
 ##
 ## ### Returns
 ## The generated simple UUID v7 string.
+## Requires the `rand` feature (default-on).
+##
+@cfg(feature = "rand")
 pub function v7_simple_at(timestamp_ms: int) -> string
     return core_v7_simple_at(timestamp_ms)
 end
@@ -104,6 +126,9 @@ end
 ##
 ## ### Returns
 ## The generated ULID string.
+## Requires the `rand` feature (default-on).
+##
+@cfg(feature = "rand")
 pub function ulid() -> string
     return core_ulid()
 end
@@ -115,6 +140,9 @@ end
 ##
 ## ### Returns
 ## The generated ULID string.
+## Requires the `rand` feature (default-on).
+##
+@cfg(feature = "rand")
 pub function ulid_at(timestamp_ms: int) -> string
     return core_ulid_at(timestamp_ms)
 end
@@ -149,6 +177,9 @@ end
 ##
 ## ### Returns
 ## The generated NanoID string.
+## Requires the `rand` feature (default-on).
+##
+@cfg(feature = "rand")
 pub function nanoid(size: int = 21, alphabet: string = "_-0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ") -> string
     return core_nanoid(size, alphabet)
 end

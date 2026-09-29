@@ -61,6 +61,22 @@ alya add uuid --git https://github.com/alya-lang/uuid --branch main
 alya install
 ```
 
+### Package Features
+
+| Feature | Default | Description |
+|:---|:---:|:---|
+| `rand` | ✅ | ID generation (`v4`, `v7`, `ulid`, `nanoid`). Without it only parsing/validation/formatting remain. |
+
+```bash
+# Full build (default)
+alya install
+alya test
+
+# Slim build without generation
+alya install --no-default-features
+alya test --no-default-features
+```
+
 ---
 
 ## 🚀 Quick Start

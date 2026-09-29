@@ -7,26 +7,8 @@ import "../src/lib.alya" as uuid
 function main()
     let runner = bench_runner("uuid Micro-Benchmarks")
 
-    # 1. UUID v4 Generation
-    bench_start(runner, 100000)
-    let i = 0
-    while i < 100000
-        uuid::v4()
-        i += 1
-    end
-    bench_stop(runner, "uuid::v4() 100k calls")
-
-    # 2. UUID v7 Generation
-    bench_start(runner, 100000)
-    let j = 0
-    while j < 100000
-        uuid::v7()
-        j += 1
-    end
-    bench_stop(runner, "uuid::v7() 100k calls")
-
     # 3. UUID Validation
-    let sample_u4 = uuid::v4()
+    let sample_u4 = "f47ac10b-58cc-4372-a567-0e02b2c3d479"
     bench_start(runner, 200000)
     let k = 0
     while k < 200000
@@ -36,7 +18,7 @@ function main()
     bench_stop(runner, "uuid::is_valid() 200k calls")
 
     # 4. UUID v7 Timestamp Extraction
-    let sample_u7 = uuid::v7()
+    let sample_u7 = "0190f6e8-5a4e-7a3b-8f2c-9d4e5f6a7b8c"
     bench_start(runner, 200000)
     let m = 0
     while m < 200000
@@ -55,6 +37,36 @@ function main()
     end
     bench_stop(runner, "to_bytes + from_bytes 50k calls")
 
+    @cfg(feature = "rand")
+    bench_gen_uuid(runner)
+    @cfg(feature = "rand")
+    bench_gen_ids(runner)
+    bench_summary(runner)
+end
+
+@cfg(feature = "rand")
+function bench_gen_uuid(runner)
+    # 1. UUID v4 Generation
+    bench_start(runner, 100000)
+    let i = 0
+    while i < 100000
+        uuid::v4()
+        i += 1
+    end
+    bench_stop(runner, "uuid::v4() 100k calls")
+
+    # 2. UUID v7 Generation
+    bench_start(runner, 100000)
+    let j = 0
+    while j < 100000
+        uuid::v7()
+        j += 1
+    end
+    bench_stop(runner, "uuid::v7() 100k calls")
+end
+
+@cfg(feature = "rand")
+function bench_gen_ids(runner)
     # 6. ULID Generation
     bench_start(runner, 100000)
     let u = 0
@@ -72,8 +84,5 @@ function main()
         nid += 1
     end
     bench_stop(runner, "uuid::nanoid(21) 100k calls")
-
-    bench_summary(runner)
 end
-
 main()
