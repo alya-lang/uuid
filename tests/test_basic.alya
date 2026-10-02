@@ -121,6 +121,7 @@ end
 
 @cfg(feature = "rand")
 function check_ulid_nanoid(r)
+    let known_ts = 1715000000000
     let ulid_fixed = uuid::ulid_at(known_ts)
     runner_assert_eq(r, len(ulid_fixed), 26, "ULID length is 26")
     runner_assert(r, uuid::ulid_is_valid(ulid_fixed) == 1, "ulid_is_valid passes")
