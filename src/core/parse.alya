@@ -37,7 +37,7 @@ end
 ## ```alya
 ## say core_is_valid("00000000-0000-0000-0000-000000000000") # 1
 ## ```
-pub function core_is_valid(s: string) -> int
+pub function core_is_valid(s: string) -> bool
     let slen = len(s)
     if slen == 36
         if char_at(s, 8) != "-" or char_at(s, 13) != "-" or char_at(s, 18) != "-" or char_at(s, 23) != "-"
@@ -74,7 +74,7 @@ end
 ##
 ## ### Returns
 ## `1` when nil, `0` otherwise.
-pub function core_is_nil(s: string) -> int
+pub function core_is_nil(s: string) -> bool
     if s == "00000000-0000-0000-0000-000000000000" or s == "00000000000000000000000000000000"
         return true
     end
@@ -88,7 +88,7 @@ end
 ##
 ## ### Returns
 ## `1` when max, `0` otherwise.
-pub function core_is_max(s: string) -> int
+pub function core_is_max(s: string) -> bool
     if s == "ffffffff-ffff-ffff-ffff-ffffffffffff" or s == "FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF" or s == "ffffffffffffffffffffffffffffffff" or s == "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
         return true
     end

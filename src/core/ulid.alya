@@ -93,7 +93,7 @@ end
 ##
 ## ### Returns
 ## `1` when valid, `0` otherwise.
-pub function core_ulid_is_valid(s: string) -> int
+pub function core_ulid_is_valid(s: string) -> bool
     if len(s) != 26
         return false
     end
