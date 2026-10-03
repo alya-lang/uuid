@@ -95,15 +95,15 @@ end
 ## `1` when valid, `0` otherwise.
 pub function core_ulid_is_valid(s: string) -> int
     if len(s) != 26
-        return 0
+        return false
     end
     let i = 0
     while i < 26
         let ch = char_at(s, i)
         if _crockford_val(ch) < 0
-            return 0
+            return false
         end
         i += 1
     end
-    return 1
+    return true
 end

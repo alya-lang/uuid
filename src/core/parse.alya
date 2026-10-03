@@ -9,8 +9,8 @@ import "../types.alya"
 function _is_hex_char(ch: string) -> int
     let c = ord(ch)
     return when
-        (c >= 48 and c <= 57) or (c >= 97 and c <= 102) or (c >= 65 and c <= 70) => 1
-        else => 0
+        (c >= 48 and c <= 57) or (c >= 97 and c <= 102) or (c >= 65 and c <= 70) => true
+        else => false
     end
 end
 
@@ -41,30 +41,30 @@ pub function core_is_valid(s: string) -> int
     let slen = len(s)
     if slen == 36
         if char_at(s, 8) != "-" or char_at(s, 13) != "-" or char_at(s, 18) != "-" or char_at(s, 23) != "-"
-            return 0
+            return false
         end
         let i = 0
         while i < 36
             if i != 8 and i != 13 and i != 18 and i != 23
-                if _is_hex_char(char_at(s, i)) == 0
-                    return 0
+                if _is_hex_char(char_at(s, i)) == false
+                    return false
                 end
             end
             i += 1
         end
-        return 1
+        return true
     end
     if slen == 32
         let i = 0
         while i < 32
-            if _is_hex_char(char_at(s, i)) == 0
-                return 0
+            if _is_hex_char(char_at(s, i)) == false
+                return false
             end
             i += 1
         end
-        return 1
+        return true
     end
-    return 0
+    return false
 end
 
 ## Checks whether a UUID is the Nil UUID (all zeroes).
@@ -76,9 +76,9 @@ end
 ## `1` when nil, `0` otherwise.
 pub function core_is_nil(s: string) -> int
     if s == "00000000-0000-0000-0000-000000000000" or s == "00000000000000000000000000000000"
-        return 1
+        return true
     end
-    return 0
+    return false
 end
 
 ## Checks whether a UUID is the Max UUID (all `f` digits).
@@ -90,9 +90,9 @@ end
 ## `1` when max, `0` otherwise.
 pub function core_is_max(s: string) -> int
     if s == "ffffffff-ffff-ffff-ffff-ffffffffffff" or s == "FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF" or s == "ffffffffffffffffffffffffffffffff" or s == "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
-        return 1
+        return true
     end
-    return 0
+    return false
 end
 
 ## Extracts the UUID version as an integer, or `0` when invalid.
@@ -103,7 +103,7 @@ end
 ## ### Returns
 ## Version number (e.g. `4` or `7`), or `0` when invalid.
 pub function core_version(s: string) -> int
-    if core_is_valid(s) == 0
+    if core_is_valid(s) == false
         return UuidVersion.Unknown
     end
     let slen = len(s)
@@ -135,7 +135,7 @@ end
 ## ### Returns
 ## Millisecond timestamp integer (`0` when not a valid v7).
 pub function core_timestamp(s: string) -> int
-    if core_is_valid(s) == 0
+    if core_is_valid(s) == false
         return 0
     end
     let v = core_version(s)
@@ -181,7 +181,7 @@ end
 ## ### Returns
 ## Byte array (empty when invalid).
 pub function core_to_bytes(s: string) -> array
-    if core_is_valid(s) == 0
+    if core_is_valid(s) == false
         return []
     end
     let hex_only = ""
@@ -304,18 +304,18 @@ end
 ## The parsed `Uuid` instance (`is_valid` is `0` when malformed).
 pub function core_parse_uuid(s: string) -> Uuid
     let valid = core_is_valid(s)
-    if valid == 0
+    if valid == false
         return Uuid {
             raw: s,
             version: UuidVersion.Unknown,
-            is_valid: 0,
+            is_valid: false,
             bytes: []
         }
     end
     return Uuid {
         raw: s,
         version: core_version(s),
-        is_valid: 1,
+        is_valid: true,
         bytes: core_to_bytes(s)
     }
 end
