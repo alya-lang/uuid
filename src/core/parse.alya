@@ -247,7 +247,7 @@ pub function core_from_bytes(bytes: array) -> string
         let b = bytes[i]
         let hi = bit_and(bit_shr(b, 4), 15)
         let lo = bit_and(b, 15)
-        hex_str = hex_str + char_at(hex_chars, hi) + char_at(hex_chars, lo)
+        hex_str += char_at(hex_chars, hi) + char_at(hex_chars, lo)
         i += 1
     end
 

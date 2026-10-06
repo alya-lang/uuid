@@ -60,13 +60,13 @@ pub function core_v7_at(timestamp_ms: int) -> string
         i += 1
     end
     res += "-7"
-    res = res + char_at(rand_part, 0) + char_at(rand_part, 1) + char_at(rand_part, 2)
+    res += char_at(rand_part, 0) + char_at(rand_part, 1) + char_at(rand_part, 2)
     res += "-"
     let orig = char_at(rand_part, 3)
     let v = _v7_hex_digit(orig)
     let variant_digit = bit_or(bit_and(v, 3), 8)
-    res = res + char_at(hex_chars, variant_digit)
-    res = res + char_at(rand_part, 4) + char_at(rand_part, 5) + char_at(rand_part, 6)
+    res += char_at(hex_chars, variant_digit)
+    res += char_at(rand_part, 4) + char_at(rand_part, 5) + char_at(rand_part, 6)
     res += "-"
     let k = 7
     while k < 19
