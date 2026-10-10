@@ -292,7 +292,7 @@ pub function core_to_urn(s: string) -> string
     if len(s) == 32
         std = core_to_standard(s)
     end
-    return "urn:uuid:{std}"
+    return f"urn:uuid:{std}"
 end
 
 ## Parses a UUID string into a `Uuid` struct.

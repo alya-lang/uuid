@@ -18,10 +18,10 @@ function main()
     let max_id = uuid::max_uuid()
     let nil_ok = uuid::is_nil(nil_id)
     let max_ok = uuid::is_max(max_id)
-    say "Nil UUID    : {nil_id}"
-    say "Max UUID    : {max_id}"
-    say "Is Nil(nil) : {nil_ok}"
-    say "Is Max(max) : {max_ok}"
+    say f"Nil UUID    : {nil_id}"
+    say f"Max UUID    : {max_id}"
+    say f"Is Nil(nil) : {nil_ok}"
+    say f"Is Max(max) : {max_ok}"
     say ""
 
     say "Done!"
@@ -36,11 +36,11 @@ function demo_ids()
     let u4_ok = uuid::is_valid(u4)
     let u4_simple = uuid::v4_simple()
     let u4_urn = uuid::to_urn(u4)
-    say "Standard v4 : {u4}"
-    say "Simple v4   : {u4_simple}"
-    say "Version     : {u4_ver}"
-    say "Is Valid    : {u4_ok}"
-    say "URN         : {u4_urn}"
+    say f"Standard v4 : {u4}"
+    say f"Simple v4   : {u4_simple}"
+    say f"Version     : {u4_ver}"
+    say f"Is Valid    : {u4_ok}"
+    say f"URN         : {u4_urn}"
     say ""
     # 2. UUID v7 Generation (Time-ordered)
     say "--- 2. UUID v7 (RFC 9562 Time-Ordered) ---"
@@ -48,10 +48,10 @@ function demo_ids()
     let u7_ver = uuid::version(u7)
     let u7_ts = uuid::get_timestamp(u7)
     let u7_simple = uuid::v7_simple()
-    say "Standard v7 : {u7}"
-    say "Simple v7   : {u7_simple}"
-    say "Version     : {u7_ver}"
-    say "Timestamp ms: {u7_ts}"
+    say f"Standard v7 : {u7}"
+    say f"Simple v7   : {u7_simple}"
+    say f"Version     : {u7_ver}"
+    say f"Timestamp ms: {u7_ts}"
     say ""
     # 4. Binary Serialization
     say "--- 4. Byte Serialization & Parsing ---"
@@ -59,11 +59,11 @@ function demo_ids()
     let byte_count = len(bytes)
     let first_byte = bytes[0]
     let restored = uuid::from_bytes(bytes)
-    say "Bytes count : {byte_count}"
-    say "First byte  : {first_byte}"
-    say "Restored    : {restored}"
+    say f"Bytes count : {byte_count}"
+    say f"First byte  : {first_byte}"
+    say f"Restored    : {restored}"
     let p = uuid::parse(u7)
-    say "Parsed v7   : valid={p.is_valid}, ver={p.version}"
+    say f"Parsed v7   : valid={p.is_valid}, ver={p.version}"
     say ""
     # 5. ULID & NanoID
     say "--- 5. ULID & NanoID ---"
@@ -72,11 +72,11 @@ function demo_ids()
     let ulid_ok = uuid::ulid_is_valid(ulid_id)
     let nano21 = uuid::nanoid(21)
     let nano12 = uuid::nanoid(12)
-    say "ULID (26)   : {ulid_id}"
-    say "ULID Time ms: {ulid_ts}"
-    say "ULID Valid  : {ulid_ok}"
-    say "NanoID (21) : {nano21}"
-    say "NanoID (12) : {nano12}"
+    say f"ULID (26)   : {ulid_id}"
+    say f"ULID Time ms: {ulid_ts}"
+    say f"ULID Valid  : {ulid_ok}"
+    say f"NanoID (21) : {nano21}"
+    say f"NanoID (12) : {nano12}"
     say ""
 end
 main()
